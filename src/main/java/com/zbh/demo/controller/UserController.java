@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,9 +25,9 @@ public class UserController {
 
     @GetMapping("{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        if (user == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        return ResponseEntity.ok(user);
+        if (id == 0) return ResponseEntity.ok(new User());
+        Optional<User> user = userRepository.findById(id);
+        return user.map(ResponseEntity::ok).orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
